@@ -1,57 +1,49 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import config from "config";
 
 export interface UserDocument extends mongoose.Document {
-    email: string;
-    name: string;
-    password: string;
-    createdAt: Date;
-    updatedAt: Date;
-    comparePassword(candidatePassword: string): Promise<boolean>;
+  email: string;
+  name: string;
+  password: string;
+  createdAt: Date;
+  updatedAt: Date;
+  comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
 const UserSchema = new mongoose.Schema(
-    {
-        email: { type : String, required: true, unique: true },
-        name: { type : String, required: true },
-        password: { type : String, required: true },
-        // firstName: { type : String, required: true, unique: true },
-        // lastName: { type : String, required: true, unique: true },
-        // DOB: { type : Number, required: true, unique: true },
-
-    },
-    {
-        timestamps: true
-    }
-)
+  {
+    email: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
+    password: { type: String, required: true },
+  },
+  { timestamps: true }
+);
 
 UserSchema.pre("save", async function (next: mongoose.HookNextFunction) {
-    let user = this as UserDocument;
+  let user = this as UserDocument;
 
-    // Only hashing the password if it has been modified/new
+  // only hash the password if it has been modified (or is new)
+  if (!user.isModified("password")) return next();
 
-    if (!user.isModified("password")) return next();
+  // Random additional data
+  const salt = await bcrypt.genSalt(config.get("saltWorkFactor"));
 
-    // Random additional data
-    const salt = await bcrypt.genSalt(config.get("saltWorkFactor"));
+  const hash = await bcrypt.hashSync(user.password, salt);
 
-    const hash = await bcrypt.hashSync(user.password, salt);
+  // Replace the password with the hash
+  user.password = hash;
 
-    // Replace the password with the hash
-    user.password = hash;
-
-    return next();
+  return next();
 });
 
 // Used for logging in
-
 UserSchema.methods.comparePassword = async function (
-    candidatePassword: string
+  candidatePassword: string
 ) {
-    const user = this as UserDocument;
+  const user = this as UserDocument;
 
-    return bcrypt.compare(candidatePassword, user.password).catch((e) => false);
+  return bcrypt.compare(candidatePassword, user.password).catch((e) => false);
 };
 
 const User = mongoose.model<UserDocument>("User", UserSchema);
