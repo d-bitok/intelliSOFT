@@ -9,7 +9,7 @@ Using :
   - MongoDB with Mongoose
 
 ## Concepts
-### The REST API Pricipals :
+### The REST API Principals :
   - CRUD user sessions
   - HTTP methods (Request, Response ... ) Express.js
 
