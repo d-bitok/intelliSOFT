@@ -1,6 +1,18 @@
 # IntelliSOFT-API-Backend
-It's a RESTful API
-Using : 
-  - Node.js
-  - Express
-  - Typescript
+## REST API
+Using these technologies : 
+* Node.js
+* Express for the Middleware
+* Typescript
+## NoSQL Database
+Using :
+  - MongoDB with Mongoose
+
+## Concepts
+### The REST API Pricipals :
+  - CRUD user sessions
+  - HTTP methods (Request, Response ... ) Express.js
+
+### JWT and Refresh Tokens
+
+  
